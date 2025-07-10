@@ -58,6 +58,7 @@ onUnmounted(() => {
   width: 100%;
   height: 80vh;
   min-height: 400px;
+  /* Eliminar cualquier restricción de max-width */
 }
 
 .map-wrapper {
@@ -67,5 +68,6 @@ onUnmounted(() => {
   background-color: #f3f4f6;
   border-radius: 0.5rem;
   overflow: hidden;
+  /* Eliminar cualquier restricción de max-width */
 }
 </style> 

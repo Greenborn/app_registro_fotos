@@ -17,7 +17,7 @@ Esta aplicación web administrativa está construida con **Vue.js 3** utilizando
 
 ### Mapeo y Geolocalización
 - **OpenStreetMap**: Mapa base de código abierto
-- **Leaflet.js**: Biblioteca JavaScript para mapas interactivos
+- **OpenLayers**: Biblioteca JavaScript para mapas interactivos
 - **Geolocation API**: API nativa del navegador para ubicación
 
 ### Herramientas de Desarrollo
@@ -96,7 +96,7 @@ frontend-admin/
 - **Modal.vue**: Componente base para modales
 
 ### 2. Componentes de Mapa (map/)
-- **MapContainer.vue**: Contenedor principal del mapa con OpenStreetMap
+- **MapContainer.vue**: Contenedor principal del mapa con OpenStreetMap y OpenLayers
 - **OperatorMarker.vue**: Marcador para operadores en el mapa
 - **PhotoMarker.vue**: Marcador para ubicaciones de fotos
 - **RoutePath.vue**: Visualización de recorridos de operadores
@@ -122,7 +122,7 @@ frontend-admin/
 
 ### useMap.js
 Composable para manejar la lógica del mapa:
-- Inicialización de OpenStreetMap con Leaflet
+- Inicialización de OpenStreetMap con OpenLayers
 - Gestión de marcadores y capas
 - Control de filtros y vistas
 - Actualización en tiempo real
@@ -187,15 +187,28 @@ Store para gestión de usuarios:
 - Validaciones y errores
 - Métodos CRUD
 
-## Integración con OpenStreetMap y Leaflet
+## Integración con OpenStreetMap y OpenLayers
 
 ### Configuración del Mapa
 ```javascript
-// Configuración básica de Leaflet con OpenStreetMap
-const map = L.map('map').setView([lat, lng], zoom);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
+import Map from 'ol/Map'
+import View from 'ol/View'
+import TileLayer from 'ol/layer/Tile'
+import OSM from 'ol/source/OSM'
+import { fromLonLat } from 'ol/proj'
+
+const map = new Map({
+  target: 'map', // id o referencia del div
+  layers: [
+    new TileLayer({
+      source: new OSM()
+    })
+  ],
+  view: new View({
+    center: fromLonLat([LONGITUD, LATITUD]),
+    zoom: 13
+  })
+})
 ```
 
 ### Marcadores de Operadores
