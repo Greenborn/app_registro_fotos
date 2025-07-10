@@ -41,10 +41,10 @@
         <div>
           <button
             type="submit"
-            :disabled="loading"
+            :disabled="authStore.isLoading"
             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            <span v-if="loading">Iniciando sesión...</span>
+            <span v-if="authStore.isLoading">Iniciando sesión...</span>
             <span v-else>Iniciar Sesión</span>
           </button>
         </div>
@@ -53,36 +53,37 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Login',
-  data() {
-    return {
-      form: {
-        username: '',
-        password: ''
-      },
-      loading: false
+<script setup>
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+
+// Store de autenticación
+const authStore = useAuthStore()
+
+// Formulario
+const form = ref({
+  username: '',
+  password: ''
+})
+
+// Manejar login
+const handleLogin = async () => {
+  try {
+    const credentials = {
+      username: form.value.username,
+      password: form.value.password
     }
-  },
-  methods: {
-    async handleLogin() {
-      this.loading = true
-      try {
-        // Aquí se implementaría la lógica de login
-        console.log('Intentando login con:', this.form)
-        
-        // Simular delay
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Por ahora, redirigir al dashboard
-        this.$router.push('/')
-      } catch (error) {
-        console.error('Error en login:', error)
-      } finally {
-        this.loading = false
-      }
+    
+    const result = await authStore.login(credentials)
+    
+    if (result.success) {
+      console.log('Login exitoso')
+      // El router ya maneja la redirección en el store
+    } else {
+      console.error('Error en login:', result.error)
     }
+  } catch (error) {
+    console.error('Error en login:', error)
   }
 }
 </script> 
