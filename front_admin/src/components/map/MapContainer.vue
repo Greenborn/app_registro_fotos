@@ -15,21 +15,21 @@ import Map from 'ol/Map'
 import View from 'ol/View'
 import TileLayer from 'ol/layer/Tile'
 import OSM from 'ol/source/OSM'
+import { fromLonLat } from 'ol/proj'
 import 'ol/ol.css'
 
 const mapContainer = ref(null)
 let mapInstance = null
 
+// Coordenadas de Tandil, Buenos Aires, Argentina
+const DEFAULT_CENTER = [-59.1332, -37.3217]
 const center = [
-  parseFloat(import.meta.env.VITE_MAP_CENTER_LNG) || -58.3816,
-  parseFloat(import.meta.env.VITE_MAP_CENTER_LAT) || -34.6037
+  parseFloat(import.meta.env.VITE_MAP_CENTER_LNG) || DEFAULT_CENTER[0],
+  parseFloat(import.meta.env.VITE_MAP_CENTER_LAT) || DEFAULT_CENTER[1]
 ]
-const zoom = parseInt(import.meta.env.VITE_MAP_ZOOM) || 10
+const zoom = parseInt(import.meta.env.VITE_MAP_ZOOM) || 13
 
 onMounted(() => {
-  // Transformar coordenadas a proyección Web Mercator
-  const fromLonLat = (coords) => window.ol && window.ol.proj ? window.ol.proj.fromLonLat(coords) : [coords[0], coords[1]];
-  // OpenLayers usa EPSG:3857, así que transformamos las coords
   mapInstance = new Map({
     target: mapContainer.value,
     layers: [
@@ -38,7 +38,7 @@ onMounted(() => {
       })
     ],
     view: new View({
-      center: window.ol && window.ol.proj ? window.ol.proj.fromLonLat(center) : center,
+      center: fromLonLat(center),
       zoom
     })
   })
