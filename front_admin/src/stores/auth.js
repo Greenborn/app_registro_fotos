@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { toast } from 'vue-toastification'
+import { useNotifications } from '@/composables/useNotifications'
 import api from '@/api'
 import { encryptData, decryptData } from '@/utils/crypto'
 
@@ -19,6 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Router
   const router = useRouter()
+  const { success, error, info, warning } = useNotifications()
 
   // Getters
   const hasPermission = computed(() => (permission) => {
@@ -98,7 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
       api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
 
       // Mostrar mensaje de éxito
-      toast.success(`Bienvenido, ${userData.nombre} ${userData.apellido}`)
+      success(`Bienvenido, ${userData.nombre} ${userData.apellido}`)
 
       // Redirigir al dashboard o a la página solicitada
       const redirectPath = router.currentRoute.value.query.redirect || '/'
@@ -116,7 +117,7 @@ export const useAuthStore = defineStore('auth', () => {
         errorMessage = error.message
       }
 
-      toast.error(errorMessage)
+      error(errorMessage)
       return { success: false, error: errorMessage }
 
     } finally {
@@ -138,7 +139,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       // Mostrar mensaje
       if (showMessage) {
-        toast.info('Sesión cerrada correctamente')
+        info('Sesión cerrada correctamente')
       }
 
       // Redirigir al login
@@ -148,8 +149,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   const refreshTokenAction = async () => {
     try {
+      // Si no hay refresh token, intentar cargar desde localStorage
       if (!refreshToken.value) {
-        throw new Error('No hay refresh token disponible')
+        const loaded = loadAuthFromStorage()
+        if (!loaded || !refreshToken.value) {
+          // No hay sesión válida, redirigir al login
+          console.log('No hay sesión válida, redirigiendo al login')
+          router.push('/login')
+          return { success: false, error: 'No hay sesión válida' }
+        }
       }
 
       const response = await api.post('/auth/refresh', {
@@ -183,9 +191,10 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error) {
       console.error('Error al renovar token:', error)
       
-      // Si falla la renovación, hacer logout
-      await logout(false)
-      throw error
+      // Si falla la renovación, limpiar datos y redirigir al login
+      clearAuthData()
+      router.push('/login')
+      return { success: false, error: 'Sesión expirada' }
     }
   }
 
@@ -195,7 +204,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       await api.post('/auth/forgot-password', { email })
       
-      toast.success('Se ha enviado un enlace de recuperación a tu correo electrónico')
+      success('Se ha enviado un enlace de recuperación a tu correo electrónico')
       return { success: true }
 
     } catch (error) {
@@ -206,7 +215,7 @@ export const useAuthStore = defineStore('auth', () => {
         errorMessage = error.response.data.message
       }
 
-      toast.error(errorMessage)
+      error(errorMessage)
       return { success: false, error: errorMessage }
 
     } finally {
@@ -224,7 +233,7 @@ export const useAuthStore = defineStore('auth', () => {
         passwordConfirmation
       })
       
-      toast.success('Contraseña actualizada correctamente')
+      success('Contraseña actualizada correctamente')
       router.push('/auth/login')
       return { success: true }
 
@@ -236,7 +245,7 @@ export const useAuthStore = defineStore('auth', () => {
         errorMessage = error.response.data.message
       }
 
-      toast.error(errorMessage)
+      error(errorMessage)
       return { success: false, error: errorMessage }
 
     } finally {
@@ -254,7 +263,7 @@ export const useAuthStore = defineStore('auth', () => {
         newPasswordConfirmation
       })
       
-      toast.success('Contraseña actualizada correctamente')
+      success('Contraseña actualizada correctamente')
       return { success: true }
 
     } catch (error) {
@@ -265,7 +274,7 @@ export const useAuthStore = defineStore('auth', () => {
         errorMessage = error.response.data.message
       }
 
-      toast.error(errorMessage)
+      error(errorMessage)
       return { success: false, error: errorMessage }
 
     } finally {
@@ -295,7 +304,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       localStorage.setItem('auth_data', encryptData(JSON.stringify(authData)))
 
-      toast.success('Perfil actualizado correctamente')
+      success('Perfil actualizado correctamente')
       return { success: true, user: updatedUser }
 
     } catch (error) {
@@ -306,7 +315,7 @@ export const useAuthStore = defineStore('auth', () => {
         errorMessage = error.response.data.message
       }
 
-      toast.error(errorMessage)
+      error(errorMessage)
       return { success: false, error: errorMessage }
 
     } finally {
@@ -393,7 +402,7 @@ export const useAuthStore = defineStore('auth', () => {
     const timeSinceLastActivity = now - lastActivity.value
 
     if (timeSinceLastActivity > sessionTimeout.value) {
-      toast.warning('Tu sesión ha expirado por inactividad')
+      warning('Tu sesión ha expirado por inactividad')
       logout(false)
     }
   }
@@ -415,6 +424,28 @@ export const useAuthStore = defineStore('auth', () => {
     if (sessionCheckInterval) {
       clearInterval(sessionCheckInterval)
       sessionCheckInterval = null
+    }
+  }
+
+  // Inicializar autenticación
+  const initializeAuth = () => {
+    try {
+      // Intentar cargar sesión desde localStorage
+      const sessionLoaded = loadAuthFromStorage()
+      
+      if (sessionLoaded) {
+        console.log('Sesión cargada correctamente')
+        // Iniciar monitoreo de sesión
+        startSessionMonitoring()
+      } else {
+        console.log('No hay sesión válida')
+      }
+      
+      return sessionLoaded
+    } catch (error) {
+      console.error('Error al inicializar autenticación:', error)
+      clearAuthData()
+      return false
     }
   }
 
@@ -446,7 +477,7 @@ export const useAuthStore = defineStore('auth', () => {
     // Acciones
     login,
     logout,
-    refreshToken: refreshTokenAction,
+    refreshTokenAction,
     forgotPassword,
     resetPassword,
     changePassword,
@@ -456,6 +487,7 @@ export const useAuthStore = defineStore('auth', () => {
     updateLastActivity,
     checkSessionTimeout,
     startSessionMonitoring,
-    stopSessionMonitoring
+    stopSessionMonitoring,
+    initializeAuth
   }
 }) 

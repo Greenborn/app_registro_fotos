@@ -1,8 +1,5 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createRouter, createWebHistory } from 'vue-router'
-import Toast from 'vue-toastification'
-import 'vue-toastification/dist/index.css'
 
 // Importar estilos globales
 import './assets/styles/main.css'
@@ -11,44 +8,15 @@ import './assets/styles/tailwind.css'
 // Importar componentes globales
 import App from './App.vue'
 
-// Importar rutas
-import routes from './router'
+// Importar router ya creado
+import router from './router'
 
 // Importar stores
 import { useAuthStore } from './stores/auth'
 import { useAppStore } from './stores/app'
 
-// Configuración de Toast
-const toastOptions = {
-  position: 'top-right',
-  timeout: 5000,
-  closeOnClick: true,
-  pauseOnFocusLoss: true,
-  pauseOnHover: true,
-  draggable: true,
-  draggablePercent: 0.6,
-  showCloseButtonOnHover: false,
-  hideProgressBar: false,
-  closeButton: 'button',
-  icon: true,
-  rtl: false
-}
-
 // Crear instancia de Pinia
 const pinia = createPinia()
-
-// Crear router
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-  scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition
-    } else {
-      return { top: 0 }
-    }
-  }
-})
 
 // Guardia de navegación para autenticación
 router.beforeEach(async (to, from, next) => {
@@ -62,9 +30,18 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth) {
     // Verificar si el usuario está autenticado
     if (!authStore.isAuthenticated) {
-      // Intentar renovar el token
+      // Intentar cargar sesión desde localStorage
+      const sessionLoaded = authStore.loadAuthFromStorage()
+      
+      if (!sessionLoaded) {
+        // No hay sesión válida, redirigir al login
+        next({ name: 'login', query: { redirect: to.fullPath } })
+        return
+      }
+      
+      // Intentar renovar el token si es necesario
       try {
-        await authStore.refreshToken()
+        await authStore.refreshTokenAction()
       } catch (error) {
         // Si no se puede renovar, redirigir al login
         next({ name: 'login', query: { redirect: to.fullPath } })
@@ -110,7 +87,10 @@ const app = createApp(App)
 // Usar plugins
 app.use(pinia)
 app.use(router)
-app.use(Toast, toastOptions)
+
+// Inicializar autenticación
+const authStore = useAuthStore()
+authStore.initializeAuth()
 
 // Configuración global de la aplicación
 app.config.globalProperties.$appName = 'Panel de Administración'
@@ -122,9 +102,16 @@ app.config.errorHandler = (err, vm, info) => {
   console.error('Componente:', vm)
   console.error('Info:', info)
   
-  // Mostrar notificación de error
-  const { toast } = require('vue-toastification')
-  toast.error('Ha ocurrido un error inesperado. Por favor, inténtelo de nuevo.')
+  // Mostrar notificación de error usando nuestro sistema
+  if (typeof window !== 'undefined') {
+    // Importar dinámicamente para evitar problemas de circular dependency
+    import('./composables/useNotifications.js').then(({ useNotifications }) => {
+      const { error } = useNotifications()
+      error('Ha ocurrido un error inesperado. Por favor, inténtelo de nuevo.')
+    }).catch(() => {
+      console.error('No se pudo mostrar la notificación de error')
+    })
+  }
 }
 
 // Manejo de advertencias en desarrollo

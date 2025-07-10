@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { io } from 'socket.io-client'
 import { useAuthStore } from './auth'
 import { useAppStore } from './app'
-import { toast } from 'vue-toastification'
+import { useNotifications } from '@/composables/useNotifications'
 
 export const useWebSocketStore = defineStore('websocket', () => {
   // Estado
@@ -20,6 +20,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
   // Stores
   const authStore = useAuthStore()
   const appStore = useAppStore()
+  const { success, warning, error } = useNotifications()
 
   // Getters
   const isConnected = computed(() => connected.value)
@@ -271,7 +272,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
       joinRoom('notifications')
       joinRoom('system')
 
-      toast.success('Conexión en tiempo real establecida')
+      success('Conexión en tiempo real establecida')
     })
 
     // Desconexión
@@ -282,13 +283,13 @@ export const useWebSocketStore = defineStore('websocket', () => {
 
       if (reason === 'io server disconnect') {
         // Desconexión iniciada por el servidor
-        toast.warning('Conexión cerrada por el servidor')
+        warning('Conexión cerrada por el servidor')
       } else if (reason === 'io client disconnect') {
         // Desconexión iniciada por el cliente
         console.log('Desconexión iniciada por el cliente')
       } else {
         // Desconexión inesperada
-        toast.error('Conexión perdida. Intentando reconectar...')
+        error('Conexión perdida. Intentando reconectar...')
         reconnect()
       }
     })
@@ -302,7 +303,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
       appStore.setWsConnected(true)
       appStore.setWsReconnecting(false)
 
-      toast.success('Conexión restablecida')
+      success('Conexión restablecida')
     })
 
     // Error de reconexión
@@ -311,7 +312,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
       reconnecting.value = false
       appStore.setWsReconnecting(false)
 
-      toast.error('No se pudo restablecer la conexión')
+      error('No se pudo restablecer la conexión')
     })
 
     // Mensajes
@@ -365,7 +366,7 @@ export const useWebSocketStore = defineStore('websocket', () => {
     // Autenticación
     socket.value.on('auth_error', (error) => {
       console.error('Error de autenticación WebSocket:', error)
-      toast.error('Error de autenticación en la conexión en tiempo real')
+      error('Error de autenticación en la conexión en tiempo real')
       
       // Intentar renovar token
       authStore.refreshToken().then(() => {

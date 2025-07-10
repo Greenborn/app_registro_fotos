@@ -62,7 +62,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['vue', 'vue-router', 'pinia'],
-          ui: ['leaflet', 'vue-leaflet'],
+          ui: ['leaflet'],
           utils: ['axios', 'lodash-es', 'moment']
         }
       }
@@ -83,7 +83,6 @@ export default defineConfig({
       'axios',
       'socket.io-client',
       'leaflet',
-      'vue-leaflet',
       '@vueuse/core',
       'lodash-es',
       'moment',

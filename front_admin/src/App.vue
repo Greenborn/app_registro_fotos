@@ -23,8 +23,8 @@
       </transition>
     </router-view>
 
-    <!-- Notificaciones toast -->
-    <div id="toast-container"></div>
+    <!-- Contenedor de notificaciones personalizado -->
+    <NotificationContainer position="top-right" />
 
     <!-- Modal de confirmación global -->
     <ConfirmationModal 
@@ -66,6 +66,7 @@ import { useWebSocketStore } from '@/stores/websocket'
 import ConfirmationModal from '@/components/modals/ConfirmationModal.vue'
 import ErrorModal from '@/components/modals/ErrorModal.vue'
 import InfoModal from '@/components/modals/InfoModal.vue'
+import NotificationContainer from '@/components/common/NotificationContainer.vue'
 
 // Stores
 const appStore = useAppStore()

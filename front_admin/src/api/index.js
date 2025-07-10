@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
-import { toast } from 'vue-toastification'
+import { useNotifications } from '@/composables/useNotifications'
 
 // Configuración base de axios
 const api = axios.create({
@@ -62,6 +62,7 @@ api.interceptors.response.use(
 
     const originalRequest = error.config
     const authStore = useAuthStore()
+    const { error: showError } = useNotifications()
 
     console.error('Error en interceptor de respuesta:', error)
 
@@ -86,7 +87,7 @@ api.interceptors.response.use(
 
     // Manejar errores de permisos
     if (error.response?.status === 403) {
-      toast.error('No tienes permisos para realizar esta acción')
+      showError('No tienes permisos para realizar esta acción')
       return Promise.reject(error)
     }
 
@@ -96,9 +97,9 @@ api.interceptors.response.use(
       if (validationErrors) {
         Object.values(validationErrors).forEach(messages => {
           if (Array.isArray(messages)) {
-            messages.forEach(message => toast.error(message))
+            messages.forEach(message => showError(message))
           } else {
-            toast.error(messages)
+            showError(messages)
           }
         })
       }
@@ -107,19 +108,19 @@ api.interceptors.response.use(
 
     // Manejar errores de servidor
     if (error.response?.status >= 500) {
-      toast.error('Error del servidor. Por favor, inténtelo más tarde.')
+      showError('Error del servidor. Por favor, inténtelo más tarde.')
       return Promise.reject(error)
     }
 
     // Manejar errores de red
     if (!error.response) {
-      toast.error('Error de conexión. Verifique su conexión a internet.')
+      showError('Error de conexión. Verifique su conexión a internet.')
       return Promise.reject(error)
     }
 
     // Manejar otros errores
     const errorMessage = error.response?.data?.message || error.message || 'Error desconocido'
-    toast.error(errorMessage)
+    showError(errorMessage)
 
     return Promise.reject(error)
   }
@@ -296,13 +297,5 @@ export const utilsAPI = {
 // Exportar instancia de axios y APIs específicas
 export default api
 export {
-  authAPI,
-  usersAPI,
-  photosAPI,
-  locationsAPI,
-  reportsAPI,
-  configAPI,
-  logsAPI,
-  utilsAPI,
   retryRequest
 } 

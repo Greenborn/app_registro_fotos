@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { toast } from 'vue-toastification'
+import { useNotifications } from '@/composables/useNotifications'
 
 export const useAppStore = defineStore('app', () => {
+  const { success, error, info, warning } = useNotifications()
   // Estado global de la aplicación
   const loading = ref(false)
   const sidebarCollapsed = ref(false)
@@ -328,10 +329,10 @@ export const useAppStore = defineStore('app', () => {
     unreadCount.value++
     
     // Mostrar toast
-    toast.info(notification.message, {
-      timeout: 5000,
-      position: 'top-right'
-    })
+    // toast.info(notification.message, {
+    //   timeout: 5000,
+    //   position: 'top-right'
+    // })
   }
 
   const markRealTimeNotificationAsRead = (id) => {
