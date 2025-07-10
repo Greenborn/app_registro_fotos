@@ -72,14 +72,26 @@ export const useAuthStore = defineStore('auth', () => {
       isLoading.value = true
       
       const response = await api.post('/auth/login', credentials)
-      const { user: userData, token: accessToken, refreshToken: refreshTokenData, permissions: userPermissions, roles: userRoles } = response.data
+      
+      // Verificar que la respuesta tenga la estructura esperada
+      if (!response.data.success || !response.data.data) {
+        throw new Error('Respuesta del servidor inválida')
+      }
+
+      const { user: userData, tokens } = response.data.data
+      const { accessToken, refreshToken: refreshTokenData } = tokens
+
+      // Verificar que userData existe
+      if (!userData) {
+        throw new Error('Datos de usuario no recibidos')
+      }
 
       // Guardar datos en el store
       user.value = userData
       token.value = accessToken
       refreshToken.value = refreshTokenData
-      permissions.value = userPermissions
-      roles.value = userRoles
+      permissions.value = userData.permissions || []
+      roles.value = userData.roles || [userData.role]
       isAuthenticated.value = true
       lastActivity.value = Date.now()
 
@@ -88,8 +100,8 @@ export const useAuthStore = defineStore('auth', () => {
         user: userData,
         token: accessToken,
         refreshToken: refreshTokenData,
-        permissions: userPermissions,
-        roles: userRoles,
+        permissions: userData.permissions || [],
+        roles: userData.roles || [userData.role],
         lastActivity: lastActivity.value
       }
       
@@ -99,7 +111,10 @@ export const useAuthStore = defineStore('auth', () => {
       api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
 
       // Mostrar mensaje de éxito
-      success(`Bienvenido, ${userData.nombre} ${userData.apellido}`)
+      const displayName = userData.nombre && userData.apellido 
+        ? `${userData.nombre} ${userData.apellido}`
+        : userData.username || 'Usuario'
+      success(`Bienvenido, ${displayName}`)
 
       // Redirigir al dashboard o a la página solicitada
       const redirectPath = router.currentRoute.value.query.redirect || '/'
@@ -161,7 +176,13 @@ export const useAuthStore = defineStore('auth', () => {
         refreshToken: refreshToken.value
       })
 
-      const { token: newToken, refreshToken: newRefreshToken } = response.data
+      // Verificar que la respuesta tenga la estructura esperada
+      if (!response.data.success || !response.data.data) {
+        throw new Error('Respuesta del servidor inválida')
+      }
+
+      const { accessToken: newToken } = response.data.data
+      const newRefreshToken = refreshToken.value // El refresh token no cambia en esta implementación
 
       // Actualizar tokens
       token.value = newToken
