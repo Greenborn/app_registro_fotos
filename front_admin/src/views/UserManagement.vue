@@ -219,7 +219,7 @@
                   </button>
 
                   <button 
-                    @click="toggleUserStatus(user)"
+                    @click="handleToggleUserStatus(user)"
                     class="action-btn toggle"
                     :title="user.isActive ? 'Desactivar usuario' : 'Activar usuario'"
                   >
@@ -232,7 +232,7 @@
                   </button>
 
                   <button 
-                    @click="deleteUser(user)"
+                    @click="handleDeleteUser(user)"
                     class="action-btn delete"
                     title="Eliminar usuario"
                   >
@@ -334,7 +334,7 @@ const editUser = (user) => {
   showEditModal.value = true
 }
 
-const deleteUser = (user) => {
+const handleDeleteUser = (user) => {
   userToDelete.value = user
   showDeleteModal.value = true
 }
@@ -364,7 +364,7 @@ const confirmReset = async () => {
   }
 }
 
-const toggleUserStatus = async (user) => {
+const handleToggleUserStatus = async (user) => {
   try {
     await toggleUserStatus(user.id)
   } catch (error) {

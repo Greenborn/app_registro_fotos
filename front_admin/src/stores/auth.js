@@ -167,6 +167,7 @@ export const useAuthStore = defineStore('auth', () => {
         if (!loaded || !refreshToken.value) {
           // No hay sesión válida, redirigir al login
           console.log('No hay sesión válida, redirigiendo al login')
+          clearAuthData()
           router.push('/login')
           return { success: false, error: 'No hay sesión válida' }
         }
@@ -456,13 +457,17 @@ export const useAuthStore = defineStore('auth', () => {
         // Iniciar monitoreo de sesión
         startSessionMonitoring()
       } else {
-        console.log('No hay sesión válida')
+        console.log('No hay sesión válida, redirigiendo al login')
+        // Redirigir al login si no hay sesión válida
+        router.push('/login')
       }
       
       return sessionLoaded
     } catch (error) {
       console.error('Error al inicializar autenticación:', error)
       clearAuthData()
+      // Redirigir al login en caso de error
+      router.push('/login')
       return false
     }
   }

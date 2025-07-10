@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { useWebSocketStore } from '@/stores/websocket'
-import { api } from '@/api'
+import api from '@/api'
 
 export function useOperators() {
   const operators = ref([])

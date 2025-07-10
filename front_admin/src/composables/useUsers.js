@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { api } from '@/api'
+import api from '@/api'
 
 export function useUsers() {
   const users = ref([])
