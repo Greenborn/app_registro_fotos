@@ -68,9 +68,17 @@ export function useUsers() {
       
       // Compatibilidad con ambos formatos de backend
       if (response.data.stat && Array.isArray(response.data.data)) {
-        users.value = response.data.data
+        users.value = response.data.data.map(u => ({
+          ...u,
+          createdAt: u.created_at,
+          isActive: u.status === 'active',
+        }))
       } else if (response.data.success && response.data.data && Array.isArray(response.data.data.users)) {
-        users.value = response.data.data.users
+        users.value = response.data.data.users.map(u => ({
+          ...u,
+          createdAt: u.created_at,
+          isActive: u.status === 'active',
+        }))
       } else {
         throw new Error(response.data.text || 'Error al cargar usuarios')
       }
