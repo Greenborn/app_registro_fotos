@@ -1,9 +1,9 @@
 <template>
-  <div class="map-container">
+  <div class="map-container h-full">
     <!-- Contenedor del mapa -->
     <div 
       ref="mapContainer" 
-      class="map-wrapper"
+      class="map-wrapper h-full"
     ></div>
     <!-- Puedes mantener los controles y overlays personalizados aquí si lo deseas -->
   </div>
@@ -56,9 +56,8 @@ onUnmounted(() => {
 .map-container {
   position: relative;
   width: 100%;
-  height: 80vh;
+  height: 100%;
   min-height: 400px;
-  /* Eliminar cualquier restricción de max-width */
 }
 
 .map-wrapper {
@@ -68,6 +67,5 @@ onUnmounted(() => {
   background-color: #f3f4f6;
   border-radius: 0.5rem;
   overflow: hidden;
-  /* Eliminar cualquier restricción de max-width */
 }
 </style> 

@@ -1,6 +1,6 @@
 <template>
   <Navigation>
-    <div>
+    <div class="h-full">
       <!-- Eliminado el título y subtítulo -->
 
       <!-- Controles del mapa -->
@@ -36,11 +36,12 @@
       </div>
 
       <!-- Mapa OpenStreetMap -->
-      <div class="bg-white rounded-lg shadow overflow-hidden" style="min-height: 400px; height: 100%; position: relative;">
+      <div class="bg-white rounded-lg shadow overflow-hidden h-full" style="min-height: 400px; height: 100%; position: relative;">
         <MapContainer
           :center="mapCenter"
           :zoom="mapZoom"
           @map-ready="onMapReady"
+          class="h-full"
         />
       </div>
       <!-- Todo lo que está debajo del mapa ha sido eliminado -->
