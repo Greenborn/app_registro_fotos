@@ -91,7 +91,6 @@ const {
 } = useMap()
 
 // Refs
-const mapContainer = ref(null)
 const currentZoom = ref(props.zoom)
 const currentCenter = ref({
   lat: props.center[0],
@@ -154,13 +153,14 @@ onUnmounted(() => {
 .map-container {
   position: relative;
   width: 100%;
-  height: 100%;
+  height: 80vh;
   min-height: 400px;
 }
 
 .map-wrapper {
   width: 100%;
   height: 100%;
+  min-height: 400px; /* Asegura que el mapa siempre tenga altura */
   background-color: #f3f4f6;
   border-radius: 0.5rem;
   overflow: hidden;

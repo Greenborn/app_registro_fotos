@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 // Importar estilos globales
 import './assets/styles/main.css'
 import './assets/styles/tailwind.css'
+import 'leaflet/dist/leaflet.css'
 
 // Importar componentes globales
 import App from './App.vue'
