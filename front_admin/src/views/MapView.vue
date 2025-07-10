@@ -5,7 +5,7 @@
 
       <!-- Controles del mapa -->
       <div class="map-filters-overlay">
-        <div class="flex flex-wrap gap-4 items-center">
+        <div class="flex flex-wrap gap-4 items-center w-full">
           <div class="flex items-center space-x-4">
             <label class="flex items-center">
               <input type="checkbox" v-model="showOperators" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
@@ -20,20 +20,23 @@
               <span class="ml-2 text-sm text-gray-700">Mostrar rutas</span>
             </label>
           </div>
+          <!-- Botón para abrir el modal de operadores -->
           <div class="ml-auto">
-            <select 
-              v-model="selectedZone"
-              class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Todas las zonas</option>
-              <option value="norte">Zona Norte</option>
-              <option value="sur">Zona Sur</option>
-              <option value="este">Zona Este</option>
-              <option value="oeste">Zona Oeste</option>
-            </select>
+            <button @click="showOperatorModal = true" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow">
+              Filtrar operadores
+            </button>
           </div>
         </div>
       </div>
+
+      <!-- Modal de filtro de operadores -->
+      <OperatorFilterModal
+        :show="showOperatorModal"
+        :operators="allOperators"
+        :selected="selectedOperators"
+        @update:selected="val => selectedOperators = val"
+        @close="showOperatorModal = false"
+      />
 
       <!-- Mapa OpenStreetMap -->
       <div class="bg-white rounded-lg shadow overflow-hidden h-full" style="min-height: 400px; height: 100%; position: relative;">
@@ -50,15 +53,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Navigation from '@/components/common/Navigation.vue'
 import MapContainer from '@/components/map/MapContainer.vue'
+import OperatorFilterModal from '@/components/map/OperatorFilterModal.vue'
 import { useMap } from '@/composables/useMap'
+import api from '@/api'
 
 const showOperators = ref(true)
 const showPhotos = ref(true)
 const showRoutes = ref(false)
-const selectedZone = ref('')
+
+const allOperators = ref([])
+const selectedOperators = ref([])
+
+const filteredOperators = computed(() =>
+  allOperators.value.filter(op => selectedOperators.value.includes(op.id))
+)
+
+const showOperatorModal = ref(false)
 
 // Centro y zoom desde variables de entorno
 const mapCenter = [
@@ -67,32 +80,38 @@ const mapCenter = [
 ]
 const mapZoom = Number(import.meta.env.VITE_MAP_ZOOM) || 10
 
-// Datos de ejemplo de operadores
-const onlineOperators = ref([
-  { id: 1, name: 'Juan Pérez', initials: 'JP', zone: 'Zona Norte', lastActivity: 'Hace 2 min', lat: -34.6037, lng: -58.3816 },
-  { id: 2, name: 'María García', initials: 'MG', zone: 'Zona Sur', lastActivity: 'Hace 5 min', lat: -34.7, lng: -58.4 },
-  { id: 3, name: 'Carlos López', initials: 'CL', zone: 'Zona Este', lastActivity: 'Hace 8 min', lat: -34.5, lng: -58.3 },
-  { id: 4, name: 'Ana Rodríguez', initials: 'AR', zone: 'Zona Oeste', lastActivity: 'Hace 12 min', lat: -34.65, lng: -58.5 }
-])
-
 // Referencia al mapa
 const { addMarker, clearMarkers } = useMap()
+
+// Obtener operadores desde el API al montar
+onMounted(async () => {
+  try {
+    const response = await api.get('/users?role=operator')
+    // Adaptar según la estructura real de la respuesta
+    const users = response.data?.users || response.data?.usuarios || []
+    allOperators.value = users
+    selectedOperators.value = users.map(op => op.id)
+  } catch (e) {
+    allOperators.value = []
+    selectedOperators.value = []
+  }
+})
 
 // Cuando el mapa está listo, agregar marcadores
 const onMapReady = (mapInstance) => {
   clearMarkers()
   if (showOperators.value) {
-    onlineOperators.value.forEach(op => {
+    filteredOperators.value.forEach(op => {
       if (op.lat && op.lng) {
         addMarker(op.id, [op.lat, op.lng], {
-          title: op.name,
+          title: op.name || op.nombre || op.username,
           icon: undefined // Aquí puedes personalizar el icono
         })
       }
     })
   }
 }
-</script> 
+</script>
 
 <style scoped>
 .map-filters-overlay {
