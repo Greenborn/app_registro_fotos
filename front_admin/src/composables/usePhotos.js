@@ -83,8 +83,19 @@ export function usePhotos() {
       
       const response = await api.get('/photos', { params })
       
-      if (response.data.stat) {
-        photos.value = response.data.data
+      // Compatibilidad con ambos formatos de backend
+      if (response.data.stat && Array.isArray(response.data.data)) {
+        photos.value = response.data.data.map(p => ({
+          ...p,
+          createdAt: p.created_at,
+          isActive: p.status === 'active',
+        }))
+      } else if (response.data.success && response.data.data && Array.isArray(response.data.data.photos)) {
+        photos.value = response.data.data.photos.map(p => ({
+          ...p,
+          createdAt: p.created_at,
+          isActive: p.status === 'active',
+        }))
       } else {
         throw new Error(response.data.text || 'Error al cargar fotos')
       }
@@ -104,8 +115,18 @@ export function usePhotos() {
       
       const response = await api.get(`/photos/operator/${operatorId}`)
       
-      if (response.data.stat) {
-        photos.value = response.data.data
+      if (response.data.stat && Array.isArray(response.data.data)) {
+        photos.value = response.data.data.map(p => ({
+          ...p,
+          createdAt: p.created_at,
+          isActive: p.status === 'active',
+        }))
+      } else if (response.data.success && response.data.data && Array.isArray(response.data.data.photos)) {
+        photos.value = response.data.data.photos.map(p => ({
+          ...p,
+          createdAt: p.created_at,
+          isActive: p.status === 'active',
+        }))
       } else {
         throw new Error(response.data.text || 'Error al cargar fotos del operador')
       }
@@ -122,8 +143,12 @@ export function usePhotos() {
     try {
       const response = await api.get(`/photos/${photoId}`)
       
-      if (response.data.stat) {
-        return response.data.data
+      if (response.data.stat && response.data.data) {
+        const p = response.data.data
+        return { ...p, createdAt: p.created_at, isActive: p.status === 'active' }
+      } else if (response.data.success && response.data.data && response.data.data.photo) {
+        const p = response.data.data.photo
+        return { ...p, createdAt: p.created_at, isActive: p.status === 'active' }
       } else {
         throw new Error(response.data.text || 'Error al obtener foto')
       }
@@ -162,17 +187,23 @@ export function usePhotos() {
   // Agregar comentario a foto
   const addComment = async (photoId, comment) => {
     try {
-      const response = await api.post(`/photos/${photoId}/comments`, {
-        comment
-      })
+      const response = await api.post(`/photos/${photoId}/comments`, { comment })
       
-      if (response.data.stat) {
+      if (response.data.stat && response.data.data) {
+        const p = response.data.data
         // Actualizar la foto en la lista
         const photoIndex = photos.value.findIndex(p => p.id === photoId)
         if (photoIndex !== -1) {
-          photos.value[photoIndex] = response.data.data
+          photos.value[photoIndex] = { ...p, createdAt: p.created_at, isActive: p.status === 'active' }
         }
-        return response.data.data
+        return { ...p, createdAt: p.created_at, isActive: p.status === 'active' }
+      } else if (response.data.success && response.data.data && response.data.data.photo) {
+        const p = response.data.data.photo
+        const photoIndex = photos.value.findIndex(p => p.id === photoId)
+        if (photoIndex !== -1) {
+          photos.value[photoIndex] = { ...p, createdAt: p.created_at, isActive: p.status === 'active' }
+        }
+        return { ...p, createdAt: p.created_at, isActive: p.status === 'active' }
       } else {
         throw new Error(response.data.text || 'Error al agregar comentario')
       }
@@ -188,8 +219,7 @@ export function usePhotos() {
     try {
       const response = await api.delete(`/photos/${photoId}`)
       
-      if (response.data.stat) {
-        // Remover de la lista
+      if ((response.data.stat && response.data.stat === true) || (response.data.success && response.data.success === true)) {
         photos.value = photos.value.filter(p => p.id !== photoId)
         return true
       } else {

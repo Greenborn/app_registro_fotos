@@ -47,7 +47,7 @@
         <div class="flex justify-between items-center">
           <h3 class="text-lg font-medium text-gray-900">Fotos Registradas</h3>
           <div class="text-sm text-gray-500">
-            {{ filteredPhotos.length }} fotos encontradas
+            {{ filteredPhotosByUI.length }} fotos encontradas
           </div>
         </div>
       </div>
@@ -77,7 +77,7 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="photo in filteredPhotos" :key="photo.id" class="hover:bg-gray-50">
+            <tr v-for="photo in filteredPhotosByUI" :key="photo.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                   <span class="text-gray-500 text-xs">Vista previa</span>
@@ -157,62 +157,41 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Navigation from '@/components/common/Navigation.vue'
+import { usePhotos } from '@/composables/usePhotos'
 
-// Estado reactivo
+// Estado reactivo para filtros
 const searchQuery = ref('')
 const statusFilter = ref('')
 const dateFilter = ref('')
 
-// Datos de ejemplo
-const photos = ref([
-  {
-    id: 1,
-    operator: 'Juan Pérez',
-    operatorId: 'OP001',
-    location: 'Zona Norte',
-    coordinates: '19.4326° N, 99.1332° W',
-    date: '2024-01-15T10:30:00',
-    status: 'pending'
-  },
-  {
-    id: 2,
-    operator: 'María García',
-    operatorId: 'OP002',
-    location: 'Zona Sur',
-    coordinates: '19.4326° N, 99.1332° W',
-    date: '2024-01-15T11:45:00',
-    status: 'approved'
-  },
-  {
-    id: 3,
-    operator: 'Carlos López',
-    operatorId: 'OP003',
-    location: 'Zona Este',
-    coordinates: '19.4326° N, 99.1332° W',
-    date: '2024-01-15T12:15:00',
-    status: 'rejected'
-  }
-])
+// Usar el composable de fotos
+const {
+  photos,
+  filteredPhotos,
+  loading,
+  error,
+  loadPhotos
+} = usePhotos()
 
-// Computed properties
-const filteredPhotos = computed(() => {
-  return photos.value.filter(photo => {
+// Cargar fotos al montar el componente
+onMounted(() => {
+  loadPhotos()
+})
+
+// Computed para filtrar por los filtros locales
+const filteredPhotosByUI = computed(() => {
+  return filteredPhotos.value.filter(photo => {
     const matchesSearch = !searchQuery.value || 
-      photo.operator.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      photo.location.toLowerCase().includes(searchQuery.value.toLowerCase())
-    
+      (photo.operator?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      photo.location?.toLowerCase().includes(searchQuery.value.toLowerCase()))
     const matchesStatus = !statusFilter.value || photo.status === statusFilter.value
-    
-    const matchesDate = !dateFilter.value || 
-      photo.date.startsWith(dateFilter.value)
-    
+    const matchesDate = !dateFilter.value || (photo.date || photo.createdAt || '').startsWith(dateFilter.value)
     return matchesSearch && matchesStatus && matchesDate
   })
 })
 
-// Methods
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('es-ES', {
     year: 'numeric',
