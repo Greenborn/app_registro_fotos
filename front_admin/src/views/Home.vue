@@ -1,5 +1,6 @@
 <template>
-  <div class="home-view">
+  <Navigation>
+    <div class="home-view">
     <!-- Header con controles -->
     <div class="controls-header">
       <div class="controls-left">
@@ -215,6 +216,7 @@
       @close="showPhotoModal = false"
     />
   </div>
+  </Navigation>
 </template>
 
 <script setup>
@@ -225,6 +227,7 @@ import { useMap } from '@/composables/useMap'
 import MapContainer from '@/components/map/MapContainer.vue'
 import OperatorDetailModal from '@/components/modals/OperatorDetailModal.vue'
 import PhotoDetailModal from '@/components/modals/PhotoDetailModal.vue'
+import Navigation from '@/components/common/Navigation.vue'
 
 // Composables
 const { 

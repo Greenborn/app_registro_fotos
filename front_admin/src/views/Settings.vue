@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <Navigation>
+    <div>
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-gray-900">Configuración</h1>
       <p class="mt-2 text-gray-600">Administra la configuración del sistema</p>
@@ -265,10 +266,12 @@
       </button>
     </div>
   </div>
+  </Navigation>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import Navigation from '@/components/common/Navigation.vue'
 
 // Iconos para las secciones
 const GeneralIcon = {

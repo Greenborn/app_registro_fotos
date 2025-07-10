@@ -67,7 +67,6 @@ import ConfirmationModal from '@/components/modals/ConfirmationModal.vue'
 import ErrorModal from '@/components/modals/ErrorModal.vue'
 import InfoModal from '@/components/modals/InfoModal.vue'
 import NotificationContainer from '@/components/common/NotificationContainer.vue'
-import Navigation from '@/components/common/Navigation.vue'
 
 // Stores
 const appStore = useAppStore()

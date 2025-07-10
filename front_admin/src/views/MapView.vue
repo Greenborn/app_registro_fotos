@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <Navigation>
+    <div>
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-gray-900">Mapa de Operadores</h1>
       <p class="mt-2 text-gray-600">Visualiza la ubicación de los operadores en tiempo real</p>
@@ -140,10 +141,12 @@
       </div>
     </div>
   </div>
+  </Navigation>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import Navigation from '@/components/common/Navigation.vue'
 
 // Estado reactivo
 const showOperators = ref(true)

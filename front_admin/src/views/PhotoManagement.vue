@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <Navigation>
+    <div>
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-gray-900">Gestión de Fotos</h1>
       <p class="mt-2 text-gray-600">Administra las fotos registradas por los operadores</p>
@@ -152,10 +153,12 @@
       </div>
     </div>
   </div>
+  </Navigation>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import Navigation from '@/components/common/Navigation.vue'
 
 // Estado reactivo
 const searchQuery = ref('')

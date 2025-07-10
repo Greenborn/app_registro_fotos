@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <Navigation>
+    <div>
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-gray-900">Reportes</h1>
       <p class="mt-2 text-gray-600">Genera y visualiza reportes de actividad</p>
@@ -222,10 +223,12 @@
       </div>
     </div>
   </div>
+  </Navigation>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import Navigation from '@/components/common/Navigation.vue'
 
 // Estado reactivo
 const dateFrom = ref('')

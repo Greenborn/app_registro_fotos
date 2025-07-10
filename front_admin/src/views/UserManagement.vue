@@ -1,5 +1,6 @@
 <template>
-  <div class="user-management">
+  <Navigation>
+    <div class="user-management">
     <!-- Header -->
     <div class="page-header">
       <div class="header-content">
@@ -285,6 +286,7 @@
       @cancel="showResetModal = false"
     />
   </div>
+  </Navigation>
 </template>
 
 <script setup>
@@ -292,6 +294,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useUsers } from '@/composables/useUsers'
 import UserFormModal from '@/components/forms/UserFormModal.vue'
 import ConfirmationModal from '@/components/modals/ConfirmationModal.vue'
+import Navigation from '@/components/common/Navigation.vue'
 
 // Composables
 const {
