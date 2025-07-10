@@ -5,7 +5,7 @@
 exports.up = function(knex) {
   return knex.schema.createTable('audit_logs', function(table) {
     table.increments('id').primary();
-    table.integer('user_id').references('id').inTable('users').onDelete('SET NULL');
+    table.integer('user_id');
     table.string('action', 100).notNullable();
     table.string('table_name', 50);
     table.integer('record_id');

@@ -3,10 +3,16 @@ require('dotenv').config();
 module.exports = {
   development: {
     client: process.env.DB_CLIENT || 'sqlite3',
-    connection: {
+    connection: process.env.DB_CLIENT === 'mysql2' ? {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT || 3306,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME
+    } : {
       filename: process.env.DB_FILENAME || './dev.sqlite3'
     },
-    useNullAsDefault: true,
+    useNullAsDefault: process.env.DB_CLIENT !== 'mysql2',
     migrations: {
       directory: './src/migrations'
     },
@@ -37,7 +43,7 @@ module.exports = {
     client: process.env.DB_CLIENT || 'postgresql',
     connection: {
       host: process.env.DB_HOST,
-      port: process.env.DB_PORT || 5432,
+      //port: process.env.DB_PORT || 5432,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME

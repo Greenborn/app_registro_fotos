@@ -5,7 +5,7 @@
 exports.up = function(knex) {
   return knex.schema.createTable('location_update_config', function(table) {
     table.increments('id').primary();
-    table.integer('user_id').notNullable().references('id').inTable('users').onDelete('CASCADE');
+    table.integer('user_id').notNullable();
     table.integer('update_frequency').notNullable().defaultTo(5000);
     table.boolean('is_enabled').notNullable().defaultTo(true);
     table.timestamp('last_update');

@@ -5,7 +5,7 @@
 exports.up = function(knex) {
   return knex.schema.createTable('user_permissions', function(table) {
     table.increments('id').primary();
-    table.integer('user_id').notNullable().references('id').inTable('users').onDelete('CASCADE');
+    table.integer('user_id').notNullable();
     table.string('permission_key', 100).notNullable();
     table.boolean('is_granted').notNullable().defaultTo(false);
     table.timestamp('created_at').defaultTo(knex.fn.now());
