@@ -23,6 +23,7 @@
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "numeral": "^2.0.6",
+    "ol": "^10.6.1",
     "pinia": "^2.1.6",
     "socket.io-client": "^4.7.4",
     "validator": "^13.11.0",
