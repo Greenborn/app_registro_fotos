@@ -107,19 +107,16 @@ export const useAuthStore = defineStore('auth', () => {
 
       return { success: true, user: userData }
 
-    } catch (error) {
-      console.error('Error en login:', error)
-      
+    } catch (errorFn) {
+      console.error('Error en login:', errorFn)
       let errorMessage = 'Error al iniciar sesión'
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message
-      } else if (error.message) {
-        errorMessage = error.message
+      if (errorFn.response?.data?.message) {
+        errorMessage = errorFn.response.data.message
+      } else if (errorFn.message) {
+        errorMessage = errorFn.message
       }
-
       error(errorMessage)
       return { success: false, error: errorMessage }
-
     } finally {
       isLoading.value = false
     }
@@ -478,6 +475,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     refreshTokenAction,
+    refreshToken: refreshTokenAction, // alias para compatibilidad
     forgotPassword,
     resetPassword,
     changePassword,
