@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="h-screen bg-gray-50 flex flex-col">
     <!-- Barra superior -->
     <nav class="bg-white shadow-sm border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,10 +50,10 @@
       </div>
     </nav>
 
-    <div class="flex">
+    <div class="flex flex-1 h-0">
       <!-- Menú lateral -->
-      <aside class="w-64 bg-white shadow-sm border-r border-gray-200">
-        <nav class="mt-5 px-2">
+      <aside class="w-64 bg-white shadow-sm border-r border-gray-200 h-full">
+        <nav class="mt-5 px-2 h-full">
           <div class="space-y-1">
             <!-- Dashboard -->
             <router-link 
@@ -133,11 +133,9 @@
       </aside>
 
       <!-- Contenido principal -->
-      <main class="flex-1">
-        <div class="py-6">
-          <div>
-            <slot />
-          </div>
+      <main class="flex-1 h-full">
+        <div class="h-full">
+          <slot />
         </div>
       </main>
     </div>

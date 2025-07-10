@@ -36,7 +36,7 @@
       </div>
 
       <!-- Mapa OpenStreetMap -->
-      <div class="bg-white rounded-lg shadow overflow-hidden mb-6" style="min-height: 400px; position: relative;">
+      <div class="bg-white rounded-lg shadow overflow-hidden" style="min-height: 400px; height: 100%; position: relative;">
         <MapContainer
           :center="mapCenter"
           :zoom="mapZoom"
@@ -109,7 +109,8 @@ const onMapReady = (mapInstance) => {
   gap: 1rem;
 }
 
-.bg-white.rounded-lg.shadow.overflow-hidden.mb-6 {
+.bg-white.rounded-lg.shadow.overflow-hidden {
   position: relative;
+  height: 100%;
 }
 </style> 
