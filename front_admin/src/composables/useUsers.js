@@ -66,8 +66,11 @@ export function useUsers() {
       
       const response = await api.get('/users')
       
-      if (response.data.stat) {
+      // Compatibilidad con ambos formatos de backend
+      if (response.data.stat && Array.isArray(response.data.data)) {
         users.value = response.data.data
+      } else if (response.data.success && response.data.data && Array.isArray(response.data.data.users)) {
+        users.value = response.data.data.users
       } else {
         throw new Error(response.data.text || 'Error al cargar usuarios')
       }
@@ -87,9 +90,15 @@ export function useUsers() {
       
       const response = await api.post('/users', userData)
       
-      if (response.data.stat) {
+      // Compatibilidad con ambos formatos de backend
+      if (response.data.stat && response.data.data) {
         users.value.push(response.data.data)
         return response.data.data
+      } else if (response.data.success && response.data.data) {
+        // Puede venir como data o data.user
+        const newUser = response.data.data.user || response.data.data
+        users.value.push(newUser)
+        return newUser
       } else {
         throw new Error(response.data.text || 'Error al crear usuario')
       }
@@ -110,12 +119,20 @@ export function useUsers() {
       
       const response = await api.put(`/users/${userId}`, userData)
       
-      if (response.data.stat) {
+      // Compatibilidad con ambos formatos de backend
+      if (response.data.stat && response.data.data) {
         const index = users.value.findIndex(u => u.id === userId)
         if (index !== -1) {
           users.value[index] = response.data.data
         }
         return response.data.data
+      } else if (response.data.success && response.data.data) {
+        const updatedUser = response.data.data.user || response.data.data
+        const index = users.value.findIndex(u => u.id === userId)
+        if (index !== -1) {
+          users.value[index] = updatedUser
+        }
+        return updatedUser
       } else {
         throw new Error(response.data.text || 'Error al actualizar usuario')
       }
@@ -136,7 +153,8 @@ export function useUsers() {
       
       const response = await api.delete(`/users/${userId}`)
       
-      if (response.data.stat) {
+      // Compatibilidad con ambos formatos de backend
+      if ((response.data.stat && response.data.stat === true) || (response.data.success && response.data.success === true)) {
         users.value = users.value.filter(u => u.id !== userId)
         return true
       } else {
@@ -188,7 +206,10 @@ export function useUsers() {
       
       const response = await api.post(`/users/${userId}/reset-password`)
       
-      if (response.data.stat) {
+      // Compatibilidad con ambos formatos de backend
+      if (response.data.stat && response.data.data) {
+        return response.data.data
+      } else if (response.data.success && response.data.data) {
         return response.data.data
       } else {
         throw new Error(response.data.text || 'Error al resetear contraseña')
