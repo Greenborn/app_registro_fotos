@@ -134,9 +134,6 @@ dev.sqlite3
 *.db-journal
 
 # Upload directories
-uploads/
-uploads/*
-!uploads/.gitkeep
 
 # Temporary files
 tmp/
