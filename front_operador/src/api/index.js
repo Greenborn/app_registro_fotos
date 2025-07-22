@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { toast } from 'vue-toastification'
-import { useAuthStore } from '../stores/auth'
-import { useAppStore } from '../stores/app'
+// import { useAuthStore } from '../stores/auth'
+// import { useAppStore } from '../stores/app'
 
 // Configuración base de axios
 const api = axios.create({
@@ -17,10 +17,10 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Agregar token de autenticación
-    const authStore = useAuthStore()
-    if (authStore.accessToken) {
-      config.headers.Authorization = `Bearer ${authStore.accessToken}`
-    }
+    // const authStore = useAuthStore()
+    // if (authStore.accessToken) {
+    //   config.headers.Authorization = `Bearer ${authStore.accessToken}`
+    // }
 
     // Agregar headers específicos para móviles
     config.headers['X-Device-Type'] = 'mobile'
@@ -73,8 +73,8 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config
-    const authStore = useAuthStore()
-    const appStore = useAppStore()
+    // const authStore = useAuthStore()
+    // const appStore = useAppStore()
 
     // Log de errores
     console.error('API Error:', {
@@ -90,14 +90,14 @@ api.interceptors.response.use(
 
       try {
         // Intentar renovar el token
-        await authStore.refreshAuthToken()
+        // await authStore.refreshAuthToken()
         
         // Reintentar la solicitud original
         return api(originalRequest)
       } catch (refreshError) {
         // Si no se puede renovar, cerrar sesión
         console.error('Error al renovar token:', refreshError)
-        authStore.clearAuth()
+        // authStore.clearAuth()
         
         // Redirigir al login
         window.location.href = '/login'
@@ -107,7 +107,7 @@ api.interceptors.response.use(
 
     // Manejar errores de red
     if (!error.response) {
-      appStore.setOnlineStatus(false)
+      // appStore.setOnlineStatus(false)
       toast.error('Error de conexión. Verifique su conexión a internet.')
       return Promise.reject(error)
     }
@@ -167,8 +167,8 @@ const uploadConfig = {
   }
 }
 
-// Métodos de API específicos para fotos
-export const photosAPI = {
+// Métodos de API para fotos
+export const photosApiTemp = {
   // Obtener fotos del usuario
   getPhotos: (params = {}) => {
     return api.get('/photos', { params })
@@ -388,7 +388,7 @@ export const configAPI = {
 // Exportar instancia de axios y métodos
 export default api
 export {
-  photosAPI,
+  photosApiTemp,
   locationsAPI,
   authAPI,
   usersAPI,

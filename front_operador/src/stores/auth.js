@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { toast } from 'vue-toastification'
-import api from '../api'
+import { useToast } from 'vue-toastification'
+// import api from '../api'
 import { encryptData, decryptData } from '../utils/crypto'
 
 export const useAuthStore = defineStore('auth', () => {
+  const toast = useToast()
   // Estado
   const user = ref(null)
   const accessToken = ref(null)

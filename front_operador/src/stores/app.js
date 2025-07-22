@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { toast } from 'vue-toastification'
+import { useToast } from 'vue-toastification'
 
 export const useAppStore = defineStore('app', () => {
+  const toast = useToast()
   // Estado general
   const loading = ref(false)
   const loadingMessage = ref('')

@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { io } from 'socket.io-client'
-import { toast } from 'vue-toastification'
+import { useToast } from 'vue-toastification'
 import { useAuthStore } from './auth'
 import { useAppStore } from './app'
 
 export const useWebSocketStore = defineStore('websocket', () => {
+  const toast = useToast()
   // Estado
   const socket = ref(null)
   const isConnected = ref(false)

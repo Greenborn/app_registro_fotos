@@ -61,10 +61,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['vue', 'vue-router', 'pinia'],
-          ui: ['leaflet', 'vue-leaflet'],
-          utils: ['axios', 'lodash-es', 'moment'],
-          camera: ['exif-js', 'compressorjs', 'geolib']
+          vendor: ['vue', 'vue-router', 'pinia']
         }
       }
     },
@@ -87,15 +84,7 @@ export default defineConfig({
       'pinia',
       'axios',
       'socket.io-client',
-      'leaflet',
-      'vue-leaflet',
-      '@vueuse/core',
-      'lodash-es',
-      'moment',
-      'date-fns',
-      'exif-js',
-      'compressorjs',
-      'geolib'
+      '@vueuse/core'
     ]
   },
   // Configuración específica para PWA
